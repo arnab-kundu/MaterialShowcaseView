@@ -3,14 +3,14 @@ package uk.co.deanwild.materialshowcaseview;
 import android.app.Activity;
 import android.view.View;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MaterialShowcaseSequence implements IDetachedListener {
 
     PrefsManager mPrefsManager;
-    Queue<MaterialShowcaseView> mShowcaseQueue;
+    List<MaterialShowcaseView> mShowcaseQueue;
     private boolean mSingleUse = false;
     Activity mActivity;
     private ShowcaseConfig mConfig;
@@ -18,10 +18,12 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
     private OnSequenceItemShownListener mOnItemShownListener = null;
     private OnSequenceItemDismissedListener mOnItemDismissedListener = null;
+    int count = -1;
+    private boolean isNext = true;
 
     public MaterialShowcaseSequence(Activity activity) {
         mActivity = activity;
-        mShowcaseQueue = new LinkedList<>();
+        mShowcaseQueue = new ArrayList<>();
     }
 
     public MaterialShowcaseSequence(Activity activity, String sequenceID) {
@@ -103,7 +105,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
             if (mSequencePosition > 0) {
                 for (int i = 0; i < mSequencePosition; i++) {
-                    mShowcaseQueue.poll();
+                    //mShowcaseQueue.poll();
                 }
             }
         }
@@ -115,11 +117,15 @@ public class MaterialShowcaseSequence implements IDetachedListener {
     }
 
     private void showNextItem() {
-
-        if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing()) {
-            MaterialShowcaseView sequenceItem = mShowcaseQueue.remove();
+        if (isNext) {
+            count++;
+        } else {
+            count--;
+        }
+        if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing() && count <= mShowcaseQueue.size() - 1 && count >= 0) {
+            MaterialShowcaseView sequenceItem = mShowcaseQueue.get(count);
             sequenceItem.setDetachedListener(this);
-            sequenceItem.show(mActivity);
+            sequenceItem.show(mActivity, mShowcaseQueue.size(), count);
             if (mOnItemShownListener != null) {
                 mOnItemShownListener.onShow(sequenceItem, mSequencePosition);
             }
@@ -138,9 +144,9 @@ public class MaterialShowcaseSequence implements IDetachedListener {
         mShowcaseQueue.clear();
 
         if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing()) {
-            MaterialShowcaseView sequenceItem = mShowcaseQueue.remove();
+            MaterialShowcaseView sequenceItem = mShowcaseQueue.get(0);
             sequenceItem.setDetachedListener(this);
-            sequenceItem.show(mActivity);
+            sequenceItem.show(mActivity, mShowcaseQueue.size(), 0);
             if (mOnItemShownListener != null) {
                 mOnItemShownListener.onShow(sequenceItem, mSequencePosition);
             }
@@ -176,11 +182,11 @@ public class MaterialShowcaseSequence implements IDetachedListener {
                 mSequencePosition++;
                 mPrefsManager.setSequenceStatus(mSequencePosition);
             }
-
-            showNextItem();
+            if (!wasSkipped)
+                showNextItem();
         }
 
-        if(wasSkipped){
+        if (wasSkipped) {
             if (mOnItemDismissedListener != null) {
                 mOnItemDismissedListener.onDismiss(showcaseView, mSequencePosition);
             }
@@ -199,6 +205,12 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
     public void setConfig(ShowcaseConfig config) {
         this.mConfig = config;
+    }
+
+    @Override
+    public boolean swipeForNext(boolean isNext) {
+        this.isNext = isNext;
+        return isNext;
     }
 
     public interface OnSequenceItemShownListener {

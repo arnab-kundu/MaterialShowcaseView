@@ -16,6 +16,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -35,6 +37,7 @@ import uk.co.deanwild.materialshowcaseview.shape.RectangleShape;
 import uk.co.deanwild.materialshowcaseview.shape.Shape;
 import uk.co.deanwild.materialshowcaseview.target.Target;
 import uk.co.deanwild.materialshowcaseview.target.ViewTarget;
+import uk.co.deanwild.materialshowcaseview.views.BaseCircleIndicator;
 
 
 /**
@@ -51,7 +54,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private int mOldWidth;
     private Bitmap mBitmap;// = new WeakReference<>(null);
     private Canvas mCanvas;
-    private Paint mEraser;
+    private Paint mEraser, mTitlePaint, mContentPaint;
     private Target mTarget;
     private Shape mShape;
     private int mXPosition;
@@ -66,6 +69,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private TextView mDismissButton;
     private boolean mHasCustomGravity;
     private TextView mSkipButton;
+    private BaseCircleIndicator indicator;
     private int mGravity;
     private int mContentBottomMargin;
     private int mContentTopMargin;
@@ -92,6 +96,13 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
     private ShowcaseTooltip toolTip;
     private boolean toolTipShown;
+    private float offsetX = 0;
+    private float finalX = 0;
+    int currentPosition = 0;
+    int sequenceItemCount = 0;
+    int heightOfScreen, widthOfScreen;
+    int leftMargin = 45;
+    String titleText, contentText;
 
     public MaterialShowcaseView(Context context) {
         super(context);
@@ -118,8 +129,13 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private void init(Context context) {
         setWillNotDraw(false);
 
-        mListeners = new ArrayList<>();
+        Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        widthOfScreen = size.x;
+        heightOfScreen = size.y;
 
+        mListeners = new ArrayList<>();
         // make sure we add a global layout listener so we can adapt to changes
         mLayoutListener = new UpdateOnGlobalLayout();
         getViewTreeObserver().addOnGlobalLayoutListener(mLayoutListener);
@@ -132,6 +148,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
 
         View contentView = LayoutInflater.from(getContext()).inflate(R.layout.showcase_content, this, true);
+
+        contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen,heightOfScreen));
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = contentView.findViewById(R.id.tv_title);
         mContentTextView = contentView.findViewById(R.id.tv_content);
@@ -140,6 +158,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         mSkipButton = contentView.findViewById(R.id.tv_skip);
         mSkipButton.setOnClickListener(this);
+        indicator = contentView.findViewById(R.id.indicator);
+        indicator.createIndicators(sequenceItemCount, 0);
     }
 
 
@@ -153,6 +173,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+
 
         // don't bother drawing if we're not ready
         if (!mShouldRender) return;
@@ -168,10 +190,13 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         if (mBitmap == null || mCanvas == null || mOldHeight != height || mOldWidth != width) {
 
             if (mBitmap != null) mBitmap.recycle();
-
+            Log.d("msg", "" + height);
             mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
             mCanvas = new Canvas(mBitmap);
+            Log.d("msg", "canvas height" + mCanvas.getHeight());
+            Log.d("msg", "device height" + heightOfScreen);
+            Log.d("msg", "canvas width" + mCanvas.getWidth());
         }
 
         // save our 'old' dimensions
@@ -189,11 +214,54 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             mEraser = new Paint();
             mEraser.setColor(0xFFFFFFFF);
             mEraser.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+            mEraser.setStrokeWidth(2);
             mEraser.setFlags(Paint.ANTI_ALIAS_FLAG);
-        }
 
+            mTitlePaint = new Paint();
+            mTitlePaint.setTextSize(55);
+            mTitlePaint.setColor(0xFFFFFFFF);
+
+
+            mContentPaint = new Paint();
+            mContentPaint.setTextSize(40);
+            mContentPaint.setColor(0xFFFFFFFF);
+        }
         // draw (erase) shape
         mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
+        //Button in lower side
+        if (mYPosition > heightOfScreen / 2) {
+            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)), mEraser);
+            //Draw Title
+            if (mXPosition > widthOfScreen / 2) {
+                mTitlePaint.setTextAlign(Paint.Align.RIGHT);
+                mContentPaint.setTextAlign(Paint.Align.RIGHT);
+                mCanvas.drawText(titleText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 125), mTitlePaint);
+                mCanvas.drawText(contentText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
+            } else {
+                mCanvas.drawText(titleText, leftMargin, ((int) (heightOfScreen / 3) - 125), mTitlePaint);
+                mCanvas.drawText(contentText, leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
+            }
+        }
+
+        //Button in upper side
+        else {
+            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3))), mEraser);
+            //Draw Title
+            if (mXPosition > widthOfScreen / 2) {
+                mTitlePaint.setTextAlign(Paint.Align.RIGHT);
+                mContentPaint.setTextAlign(Paint.Align.RIGHT);
+                mCanvas.drawText(titleText, widthOfScreen - leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 75)), mTitlePaint);
+                mCanvas.drawText(contentText, widthOfScreen - leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+
+            } else {
+                mCanvas.drawText(titleText, leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 75)), mTitlePaint);
+                mCanvas.drawText(contentText, leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+            }
+        }
+
+
+        //Draw Content
+
 
         // Draw the bitmap on our views  canvas.
         canvas.drawBitmap(mBitmap, 0, 0, null);
@@ -219,14 +287,27 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (mDismissOnTouch) {
-            hide();
-        }
-        if (mTargetTouchable && mTarget.getBounds().contains((int) event.getX(), (int) event.getY())) {
-            if (mDismissOnTargetTouch) {
-                hide();
-            }
-            return false;
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                offsetX = event.getX();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                finalX = event.getX();
+                if ((offsetX - finalX) > 300) {
+                    //SHOW NEXT
+                    hide();
+                    mDetachedListener.swipeForNext(true);
+                }
+
+                if ((finalX - offsetX) > 300) {
+                    //SHOW PREVIOUS
+                    hide();
+                    mDetachedListener.swipeForNext(false);
+                }
+                break;
+
         }
         return true;
     }
@@ -307,7 +388,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             /**
              * If we're on lollipop then make sure we don't draw over the nav bar
              */
-            if (!mRenderOverNav && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          /*  if (!mRenderOverNav && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
 
                 mBottomMargin = getSoftButtonsBarSizePort();
@@ -317,7 +398,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
                 if (contentLP != null && contentLP.bottomMargin != mBottomMargin)
                     contentLP.bottomMargin = mBottomMargin;
-            }
+            }*/
 
             // apply the target position
             Point targetPoint = mTarget.getPoint();
@@ -326,7 +407,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
             // now figure out whether to put content above or below it
             int height = getMeasuredHeight();
-            int midPoint = height / 2;
+            int midPoint =(int) (height *0.90);
             int yPos = targetPoint.y;
 
             int radius = Math.max(targetBounds.height(), targetBounds.width()) / 2;
@@ -357,7 +438,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private void applyLayoutParams() {
 
         if (mContentBox != null && mContentBox.getLayoutParams() != null) {
-            FrameLayout.LayoutParams contentLP = (LayoutParams) mContentBox.getLayoutParams();
+            LayoutParams contentLP = (LayoutParams) mContentBox.getLayoutParams();
 
             boolean layoutParamsChanged = false;
 
@@ -423,16 +504,18 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         mYPosition = y;
     }
 
-    private void setTitleText(CharSequence contentText) {
-        if (mTitleTextView != null && !contentText.equals("")) {
+    private void setTitleText(CharSequence titleText) {
+        if (mTitleTextView != null && !titleText.equals("")) {
             mContentTextView.setAlpha(0.5F);
-            mTitleTextView.setText(contentText);
+            mTitleTextView.setText(titleText);
+            this.titleText = (String) titleText;
         }
     }
 
     private void setContentText(CharSequence contentText) {
         if (mContentTextView != null) {
             mContentTextView.setText(contentText);
+            this.contentText = (String) contentText;
         }
     }
 
@@ -562,41 +645,41 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
      * @param config
      */
     public void setConfig(ShowcaseConfig config) {
-
-        if(config.getDelay() > -1){
+        sequenceItemCount = config.getItemCount();
+        if (config.getDelay() > -1) {
             setDelay(config.getDelay());
         }
 
-        if(config.getFadeDuration() > 0){
+        if (config.getFadeDuration() > 0) {
             setFadeDuration(config.getFadeDuration());
         }
 
 
-        if(config.getContentTextColor() > 0){
+        if (config.getContentTextColor() > 0) {
             setContentTextColor(config.getContentTextColor());
         }
 
-        if(config.getDismissTextColor() > 0){
+        if (config.getDismissTextColor() > 0) {
             setDismissTextColor(config.getDismissTextColor());
         }
 
-        if(config.getDismissTextStyle() != null){
+        if (config.getDismissTextStyle() != null) {
             setDismissStyle(config.getDismissTextStyle());
         }
 
-        if(config.getMaskColor() > 0){
+        if (config.getMaskColor() > 0) {
             setMaskColour(config.getMaskColor());
         }
 
-        if(config.getShape() != null){
+        if (config.getShape() != null) {
             setShape(config.getShape());
         }
 
-        if(config.getShapePadding() > -1){
+        if (config.getShapePadding() > -1) {
             setShapePadding(config.getShapePadding());
         }
 
-        if(config.getRenderOverNavigationBar() != null){
+        if (config.getRenderOverNavigationBar() != null) {
             setRenderOverNavigationBar(config.getRenderOverNavigationBar());
         }
     }
@@ -914,7 +997,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
 
         public MaterialShowcaseView show() {
-            build().show(activity);
+            build().show(activity, 0, 0);//Currently folow in not coming in this part of code.
             return showcaseView;
         }
     }
@@ -925,6 +1008,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     }
 
     public void removeFromWindow() {
+        mWasDismissed = true;
         if (getParent() != null && getParent() instanceof ViewGroup) {
             ((ViewGroup) getParent()).removeView(this);
         }
@@ -935,7 +1019,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
 
         mEraser = null;
-        mAnimationFactory = null;
+        //mAnimationFactory = null;
         mCanvas = null;
         mHandler = null;
 
@@ -957,7 +1041,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
      * @param activity
      * @return
      */
-    public boolean show(final Activity activity) {
+    public boolean show(final Activity activity, int pageCount, int currentPosition) {
 
         /**
          * if we're in single use mode and have already shot our bolt then do nothing
@@ -969,9 +1053,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
                 mPrefsManager.setFired();
             }
         }
-
+        //if (((ViewGroup) activity.getWindow().getDecorView()).getChildCount() > 0)
+        //((ViewGroup) activity.getWindow().getDecorView()).removeAllViews();
         ((ViewGroup) activity.getWindow().getDecorView()).addView(this);
-
+        indicator.createIndicators(sequenceItemCount, currentPosition);
         setShouldRender(true);
 
 

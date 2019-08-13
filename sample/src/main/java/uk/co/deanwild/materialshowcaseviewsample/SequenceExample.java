@@ -59,8 +59,8 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
     private void presentShowcaseSequence() {
 
         ShowcaseConfig config = new ShowcaseConfig();
-        config.setDelay(500); // half second between each showcase view
-
+        config.setDelay(0); // half second between each showcase view
+        config.setItemCount(3);
         MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
 
         sequence.setOnItemShownListener(new MaterialShowcaseSequence.OnSequenceItemShownListener() {
@@ -72,24 +72,32 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
 
         sequence.setConfig(config);
 
-        sequence.addSequenceItem(mButtonOne, "This is button one", "GOT IT");
+        sequence.addSequenceItem(
+                new MaterialShowcaseView.Builder(this)
+                        .setSkipText("SKIP")
+                        .setTarget(mButtonOne)
+                        .setTitleText("Aman")
+                        .setContentText("This is button One")
+                        .withCircleShape()
+                        .build()
+        );
 
         sequence.addSequenceItem(
                 new MaterialShowcaseView.Builder(this)
                         .setSkipText("SKIP")
+                        .setTitleText("Arnab")
                         .setTarget(mButtonTwo)
-                        .setDismissText("GOT IT")
                         .setContentText("This is button two")
-                        .withRectangleShape(true)
+                        .withCircleShape()
                         .build()
         );
 
         sequence.addSequenceItem(
                 new MaterialShowcaseView.Builder(this)
                         .setTarget(mButtonThree)
-                        .setDismissText("GOT IT")
+                        .setTitleText("Kumar")
                         .setContentText("This is button three")
-                        .withRectangleShape()
+                        .withCircleShape()
                         .build()
         );
 

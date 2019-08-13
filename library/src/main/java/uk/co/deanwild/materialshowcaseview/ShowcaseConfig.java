@@ -3,7 +3,6 @@ package uk.co.deanwild.materialshowcaseview;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
-import uk.co.deanwild.materialshowcaseview.shape.CircleShape;
 import uk.co.deanwild.materialshowcaseview.shape.Shape;
 
 
@@ -21,6 +20,16 @@ public class ShowcaseConfig {
     private Shape mShape = null;
     private int mShapePadding = -1;
     private Boolean renderOverNav;
+
+    public int getItemCount() {
+        return itemCount;
+    }
+
+    public void setItemCount(int itemCount) {
+        this.itemCount = itemCount;
+    }
+
+    private int itemCount = 0;
 
     public ShowcaseConfig() {
         mMaskColour = Color.parseColor(ShowcaseConfig.DEFAULT_MASK_COLOUR);
