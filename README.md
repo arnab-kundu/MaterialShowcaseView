@@ -124,7 +124,7 @@ Publishing libraries to Maven is a chore that takes time and effort. Jitpack.io 
 
 
 [1]: https://github.com/amlcurran/ShowcaseView
-[2]: http://i.imgur.com/rFHENgz.gif
+[2]: https://github.com/arnab-kundu/MaterialShowcaseView/blob/customized/demo_showcase.gif
 [3]: https://code.google.com/p/android-flowtextview/
 [4]: https://img.shields.io/github/release/deano2390/MaterialShowcaseView.svg?label=JitPack
 [5]: https://jitpack.io/#deano2390/MaterialShowcaseView
