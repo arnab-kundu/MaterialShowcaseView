@@ -149,7 +149,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         View contentView = LayoutInflater.from(getContext()).inflate(R.layout.showcase_content, this, true);
 
-        contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen,heightOfScreen));
+        contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen, heightOfScreen));
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = contentView.findViewById(R.id.tv_title);
         mContentTextView = contentView.findViewById(R.id.tv_content);
@@ -173,7 +173,6 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
 
 
         // don't bother drawing if we're not ready
@@ -232,6 +231,13 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         if (mYPosition > heightOfScreen / 2) {
             mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)), mEraser);
             //Draw Title
+            if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
+                mTitlePaint.setTextAlign(Paint.Align.CENTER);
+                mContentPaint.setTextAlign(Paint.Align.CENTER);
+                mCanvas.drawText(titleText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) - 75)), mTitlePaint);
+                mCanvas.drawText(contentText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) - 125)), mContentPaint);
+            }
+
             if (mXPosition > widthOfScreen / 2) {
                 mTitlePaint.setTextAlign(Paint.Align.RIGHT);
                 mContentPaint.setTextAlign(Paint.Align.RIGHT);
@@ -247,7 +253,12 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         else {
             mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3))), mEraser);
             //Draw Title
-            if (mXPosition > widthOfScreen / 2) {
+            if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
+                mTitlePaint.setTextAlign(Paint.Align.CENTER);
+                mContentPaint.setTextAlign(Paint.Align.CENTER);
+                mCanvas.drawText(titleText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) + 75)), mTitlePaint);
+                mCanvas.drawText(contentText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+            } else if (mXPosition > widthOfScreen / 2) {
                 mTitlePaint.setTextAlign(Paint.Align.RIGHT);
                 mContentPaint.setTextAlign(Paint.Align.RIGHT);
                 mCanvas.drawText(titleText, widthOfScreen - leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 75)), mTitlePaint);
@@ -407,7 +418,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
             // now figure out whether to put content above or below it
             int height = getMeasuredHeight();
-            int midPoint =(int) (height *0.90);
+            int midPoint = (int) (height * 0.90);
             int yPos = targetPoint.y;
 
             int radius = Math.max(targetBounds.height(), targetBounds.width()) / 2;
