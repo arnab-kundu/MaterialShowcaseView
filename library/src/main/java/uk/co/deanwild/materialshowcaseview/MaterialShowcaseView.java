@@ -234,11 +234,9 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
                 mTitlePaint.setTextAlign(Paint.Align.CENTER);
                 mContentPaint.setTextAlign(Paint.Align.CENTER);
-                mCanvas.drawText(titleText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) - 75)), mTitlePaint);
-                mCanvas.drawText(contentText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) - 125)), mContentPaint);
-            }
-
-            if (mXPosition > widthOfScreen / 2) {
+                mCanvas.drawText(titleText, mXPosition, ((int) ((heightOfScreen / 3) - 75)), mTitlePaint);
+                mCanvas.drawText(contentText, mXPosition, ((int) ((heightOfScreen / 3) - 125)), mContentPaint);
+            } else if (mXPosition > widthOfScreen / 2) {
                 mTitlePaint.setTextAlign(Paint.Align.RIGHT);
                 mContentPaint.setTextAlign(Paint.Align.RIGHT);
                 mCanvas.drawText(titleText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 125), mTitlePaint);
