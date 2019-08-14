@@ -3,6 +3,7 @@ package uk.co.deanwild.materialshowcaseview;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,15 +17,21 @@ import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -148,8 +155,44 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
 
         View contentView = LayoutInflater.from(getContext()).inflate(R.layout.showcase_content, this, true);
-
         contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen, heightOfScreen));
+        indicator = contentView.findViewById(R.id.indicator);
+        switch (display.getRotation()) {
+            case Surface.ROTATION_0:
+                System.out.println("SCREEN_ORIENTATION_PORTRAIT");
+                break;
+
+            case Surface.ROTATION_90:
+                System.out.println("SCREEN_ORIENTATION_LANDSCAPE");
+                break;
+
+            case Surface.ROTATION_180:
+                System.out.println("SCREEN_ORIENTATION_REVERSE_PORTRAIT");
+                break;
+
+            case Surface.ROTATION_270:
+                System.out.println("SCREEN_ORIENTATION_REVERSE_LANDSCAPE");
+                //TODO
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                    //getResources().getConfiguration().navigation == Configuration.NAVIGATIONHIDDEN_NO) {
+                    contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen + 144, heightOfScreen));
+                    LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) indicator.getLayoutParams();
+                    lp.setMargins(144,0,0,0);
+                    indicator.setLayoutParams(lp);
+                }
+                break;
+        }
+       /* if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
+                getResources().getConfiguration().navigation == Configuration.NAVIGATIONHIDDEN_NO) {
+            Log.e("landscape", "yes" + widthOfScreen);
+            contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen, heightOfScreen));
+        } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
+                getResources().getConfiguration().navigation == Configuration.NAVIGATIONHIDDEN_YES) {
+            //TODO
+        } else {
+            Log.e("landscape", "no" + widthOfScreen);
+            contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen, heightOfScreen));
+        }*/
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = contentView.findViewById(R.id.tv_title);
         mContentTextView = contentView.findViewById(R.id.tv_content);
@@ -189,13 +232,13 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         if (mBitmap == null || mCanvas == null || mOldHeight != height || mOldWidth != width) {
 
             if (mBitmap != null) mBitmap.recycle();
-            Log.d("msg", "" + height);
+            //Log.d("msg", "" + height);
             mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
             mCanvas = new Canvas(mBitmap);
-            Log.d("msg", "canvas height" + mCanvas.getHeight());
-            Log.d("msg", "device height" + heightOfScreen);
-            Log.d("msg", "canvas width" + mCanvas.getWidth());
+            //Log.d("msg", "canvas height" + mCanvas.getHeight());
+            //Log.d("msg", "device height" + heightOfScreen);
+            //Log.d("msg", "canvas width" + mCanvas.getWidth());
         }
 
         // save our 'old' dimensions
@@ -1198,5 +1241,38 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
     private void setRenderOverNavigationBar(boolean mRenderOverNav) {
         this.mRenderOverNav = mRenderOverNav;
+    }
+
+    public boolean hasSoftKeys() {
+        boolean hasSoftwareKeys = true;
+        //c = context; use getContext(); in fragments, and in activities you can
+        //directly access the windowManager();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Display d = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
+            DisplayMetrics realDisplayMetrics = new DisplayMetrics();
+            d.getRealMetrics(realDisplayMetrics);
+
+            int realHeight = realDisplayMetrics.heightPixels;
+            int realWidth = realDisplayMetrics.widthPixels;
+
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            d.getMetrics(displayMetrics);
+
+            int displayHeight = displayMetrics.heightPixels;
+            int displayWidth = displayMetrics.widthPixels;
+
+            hasSoftwareKeys = (realWidth - displayWidth) > 0 ||
+                    (realHeight - displayHeight) > 0;
+            Log.e("hassoftkey", String.valueOf(realWidth - displayWidth));
+        } else {
+            boolean hasMenuKey = false;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                hasMenuKey = ViewConfiguration.get(((Activity) getContext())).hasPermanentMenuKey();
+            }
+            boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
+            hasSoftwareKeys = !hasMenuKey && !hasBackKey;
+        }
+        return hasSoftwareKeys;
     }
 }
