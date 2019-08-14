@@ -133,7 +133,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
             /**
              * We've reached the end of the sequence, save the fired state
              */
-            if (mSingleUse) {
+            if (mSingleUse && count != -1) {
                 mPrefsManager.setFired();
             }
         }
