@@ -3,6 +3,7 @@
 # MaterialShowcaseView
 A Material Design themed ShowcaseView for Android
 
+[![](https://jitpack.io/v/arnab-kundu/MaterialShowcaseView.svg)](https://jitpack.io/#arnab-kundu/MaterialShowcaseView)
 
 This library is heavily inspired by the original [ShowcaseView library][1].
 
