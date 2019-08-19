@@ -61,7 +61,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private int mOldWidth;
     private Bitmap mBitmap;// = new WeakReference<>(null);
     private Canvas mCanvas;
-    private Paint mEraser, mTitlePaint, mContentPaint;
+    private Paint mEraser, mTitlePaint, mContentPaint,mLinePaint;
     private Target mTarget;
     private Shape mShape;
     private int mXPosition;
@@ -275,6 +275,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             mContentPaint.setTextSize(40);
             mContentPaint.setColor(0xFFFFFFFF);
 
+            mLinePaint = new Paint();
+            mLinePaint.setStrokeWidth(2);
+            mLinePaint.setColor(0x00FFFFFF);
+
             if (screenDensity >= 3.5f) {
                 mTitlePaint.setTextSize(65);
                 mContentPaint.setTextSize(50);
@@ -299,7 +303,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
         //Button in lower side
         if (mYPosition > heightOfScreen / 2) {
-            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)), mEraser);
+            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)), mLinePaint);
             //Draw Title
             if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
                 mTitlePaint.setTextAlign(Paint.Align.CENTER);
@@ -319,7 +323,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         //Button in upper side
         else {
-            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3))), mEraser);
+            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3))), mLinePaint);
             //Draw Title
             if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
                 mTitlePaint.setTextAlign(Paint.Align.CENTER);
