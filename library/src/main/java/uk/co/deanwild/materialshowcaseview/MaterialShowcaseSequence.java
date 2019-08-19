@@ -31,17 +31,17 @@ public class MaterialShowcaseSequence implements IDetachedListener {
         this.singleUse(sequenceID);
     }
 
-    public MaterialShowcaseSequence addSequenceItem(View targetView, String content, String dismissText) {
+   /* public MaterialShowcaseSequence addSequenceItem(View targetView, String content, String dismissText) {
         addSequenceItem(targetView, "", content, dismissText);
         return this;
-    }
+    }*/
 
-    public MaterialShowcaseSequence addSequenceItem(View targetView, String title, String content, String dismissText) {
+    public MaterialShowcaseSequence addSequenceItem(View targetView, String title, String content) {
 
         MaterialShowcaseView sequenceItem = new MaterialShowcaseView.Builder(mActivity)
                 .setTarget(targetView)
                 .setTitleText(title)
-                .setDismissText(dismissText)
+                .setDismissText("")
                 .setContentText(content)
                 .setSequence(true)
                 .build();

@@ -110,6 +110,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     int heightOfScreen, widthOfScreen;
     int leftMargin = 45;
     String titleText, contentText;
+    float screenDensity = 1.5f;
 
     public MaterialShowcaseView(Context context) {
         super(context);
@@ -173,11 +174,11 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             case Surface.ROTATION_270:
                 System.out.println("SCREEN_ORIENTATION_REVERSE_LANDSCAPE");
                 //TODO
-                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     //getResources().getConfiguration().navigation == Configuration.NAVIGATIONHIDDEN_NO) {
                     contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen + 144, heightOfScreen));
                     LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) indicator.getLayoutParams();
-                    lp.setMargins(144,0,0,0);
+                    lp.setMargins(144, 0, 0, 0);
                     indicator.setLayoutParams(lp);
                 }
                 break;
@@ -203,6 +204,12 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         mSkipButton.setOnClickListener(this);
         indicator = contentView.findViewById(R.id.indicator);
         indicator.createIndicators(sequenceItemCount, 0);
+
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int densityDpi = (int) (metrics.density * 160f);
+        Log.d("msg densityDpi", "" + densityDpi);
+        Log.d("msg metrics.density", "" + metrics.density);
+        screenDensity = metrics.density;
     }
 
 
@@ -267,6 +274,26 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             mContentPaint = new Paint();
             mContentPaint.setTextSize(40);
             mContentPaint.setColor(0xFFFFFFFF);
+
+            if (screenDensity >= 3.5f) {
+                mTitlePaint.setTextSize(65);
+                mContentPaint.setTextSize(50);
+            } else if (screenDensity >= 3.0f) {
+                mTitlePaint.setTextSize(55);
+                mContentPaint.setTextSize(40);
+            } else if (screenDensity >= 2.5f) {
+                mTitlePaint.setTextSize(50);
+                mContentPaint.setTextSize(35);
+            } else if (screenDensity >= 2.0f) {
+                mTitlePaint.setTextSize(35);
+                mContentPaint.setTextSize(25);
+            } else if (screenDensity >= 1.5f) {
+                mTitlePaint.setTextSize(25);
+                mContentPaint.setTextSize(10);
+            } else {
+                mTitlePaint.setTextSize(25);
+                mContentPaint.setTextSize(10);
+            }
         }
         // draw (erase) shape
         mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
