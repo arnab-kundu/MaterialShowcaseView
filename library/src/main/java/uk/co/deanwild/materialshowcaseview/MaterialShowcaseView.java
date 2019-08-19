@@ -277,7 +277,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
             mLinePaint = new Paint();
             mLinePaint.setStrokeWidth(2);
-            mLinePaint.setColor(0x00FFFFFF);
+            mLinePaint.setColor(0xFFFFFFFF);
 
             if (screenDensity >= 3.5f) {
                 mTitlePaint.setTextSize(65);
