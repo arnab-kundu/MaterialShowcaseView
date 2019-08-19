@@ -76,7 +76,7 @@ public class TooltipExample extends Activity implements View.OnClickListener {
                 .text("This is a <b>very funky</b> tooltip<br><br>This is a very long sentence to test how this tooltip behaves with longer strings. <br><br>Tap anywhere to continue");
 
 
-        sequence.addSequenceItem(
+      /*  sequence.addSequenceItem(
 
                 new MaterialShowcaseView.Builder(this)
                         .setTarget(toolbar)
@@ -87,7 +87,7 @@ public class TooltipExample extends Activity implements View.OnClickListener {
                         .setDismissOnTouch(true)
                         .setMaskColour(getResources().getColor(R.color.tooltip_mask))
                         .build()
-        );
+        );*/
 
 
         ShowcaseTooltip toolTip2 = ShowcaseTooltip.build(this)
@@ -95,7 +95,7 @@ public class TooltipExample extends Activity implements View.OnClickListener {
                 .textColor(Color.parseColor("#007686"))
                 .text("This is another <b>very funky</b> tooltip");
 
-        sequence.addSequenceItem(
+     /*   sequence.addSequenceItem(
                 new MaterialShowcaseView.Builder(this)
                         .setTarget(fab)
                         .setToolTip(toolTip2)
@@ -104,7 +104,7 @@ public class TooltipExample extends Activity implements View.OnClickListener {
                         .setDismissOnTouch(true)
                         .setMaskColour(getResources().getColor(R.color.tooltip_mask))
                         .build()
-        );
+        );*/
 
         sequence.start();
     }

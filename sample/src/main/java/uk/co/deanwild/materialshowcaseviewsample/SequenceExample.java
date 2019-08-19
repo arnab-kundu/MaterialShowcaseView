@@ -71,12 +71,12 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    public boolean hasSoftKeys(Context context){
+    public boolean hasSoftKeys(Context context) {
         boolean hasSoftwareKeys = true;
         //c = context; use getContext(); in fragments, and in activities you can
         //directly access the windowManager();
 
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN_MR1){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             Display d = this.getWindowManager().getDefaultDisplay();
             DisplayMetrics realDisplayMetrics = new DisplayMetrics();
             d.getRealMetrics(realDisplayMetrics);
@@ -90,9 +90,9 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
             int displayHeight = displayMetrics.heightPixels;
             int displayWidth = displayMetrics.widthPixels;
 
-            hasSoftwareKeys =  (realWidth - displayWidth) > 0 ||
+            hasSoftwareKeys = (realWidth - displayWidth) > 0 ||
                     (realHeight - displayHeight) > 0;
-            Log.e("hassoftkey", String.valueOf(realWidth - displayWidth) );
+            Log.e("hassoftkey", String.valueOf(realWidth - displayWidth));
         } else {
             boolean hasMenuKey = false;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
