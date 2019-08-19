@@ -120,7 +120,7 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
 
         sequence.setConfig(config);
 
-        sequence.addSequenceItem(
+        /*sequence.addSequenceItem(
                 new MaterialShowcaseView.Builder(this)
                         .setSkipText("SKIP")
                         .setTarget(mButtonOne)
@@ -156,7 +156,14 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
                         .setContentText("This is button reset")
                         .withCircleShape()
                         .build()
-        );
+        );*/
+
+        sequence.addSequenceItem(mButtonOne,"Aman","This is Button one");
+        sequence.addSequenceItem(mButtonTwo,"Arnab","This is Button two");
+        sequence.addSequenceItem(mButtonThree,"Kumar","This is Button three");
+        sequence.addSequenceItem(mButtonReset,"Reset","This is Button Reset");
+
+
 
         sequence.start();
 
