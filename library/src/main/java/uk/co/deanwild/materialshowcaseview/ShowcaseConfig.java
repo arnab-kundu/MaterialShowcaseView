@@ -20,6 +20,16 @@ public class ShowcaseConfig {
     private Shape mShape = null;
     private int mShapePadding = -1;
     private Boolean renderOverNav;
+    private boolean showEveryTime = false;
+
+    public boolean isShowEveryTime() {
+        return showEveryTime;
+    }
+
+    public void setShowEveryTime(boolean showEveryTime) {
+        this.showEveryTime = showEveryTime;
+    }
+
 
     public int getItemCount() {
         return itemCount;

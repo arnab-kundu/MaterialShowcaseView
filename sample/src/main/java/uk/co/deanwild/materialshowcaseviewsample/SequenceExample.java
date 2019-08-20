@@ -1,6 +1,7 @@
 package uk.co.deanwild.materialshowcaseviewsample;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -109,6 +110,8 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
         ShowcaseConfig config = new ShowcaseConfig();
         config.setDelay(0); // half second between each showcase view
         config.setItemCount(4);
+        SharedPreferences sharedPreferences=getSharedPreferences("ARC",MODE_PRIVATE);
+        config.setShowEveryTime(sharedPreferences.getBoolean("wantTutorial",false));
         MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
 
         sequence.setOnItemShownListener(new MaterialShowcaseSequence.OnSequenceItemShownListener() {
@@ -119,7 +122,6 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
         });
 
         sequence.setConfig(config);
-
         /*sequence.addSequenceItem(
                 new MaterialShowcaseView.Builder(this)
                         .setSkipText("SKIP")

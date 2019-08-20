@@ -1,6 +1,7 @@
 package uk.co.deanwild.materialshowcaseview;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -93,8 +94,12 @@ public class MaterialShowcaseSequence implements IDetachedListener {
          * Check if we've already shot our bolt and bail out if so         *
          */
         if (mSingleUse) {
+            Log.d("msg", "hasFired() " + hasFired() + "!mConfig.isShowEveryTime()" + !mConfig.isShowEveryTime());
             if (hasFired()) {
-                return;
+                if (!mConfig.isShowEveryTime()
+
+                )
+                    return;
             }
 
             /**
