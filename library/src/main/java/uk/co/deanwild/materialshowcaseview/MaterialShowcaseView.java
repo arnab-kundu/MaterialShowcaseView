@@ -61,7 +61,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private int mOldWidth;
     private Bitmap mBitmap;// = new WeakReference<>(null);
     private Canvas mCanvas;
-    private Paint mEraser, mTitlePaint, mContentPaint,mLinePaint;
+    private Paint mEraser, mTitlePaint, mContentPaint, mLinePaint;
     private Target mTarget;
     private Shape mShape;
     private int mXPosition;
@@ -300,7 +300,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             }
         }
         // draw (erase) shape
-        mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
+        // mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
         //Button in lower side
         if (mYPosition > heightOfScreen / 2) {
             mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)), mLinePaint);
@@ -342,10 +342,10 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             }
         }
 
-
+        mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
         //Draw Content
 
-
+        Log.d("heightOfScreen", "" + heightOfScreen);
         // Draw the bitmap on our views  canvas.
         canvas.drawBitmap(mBitmap, 0, 0, null);
     }
