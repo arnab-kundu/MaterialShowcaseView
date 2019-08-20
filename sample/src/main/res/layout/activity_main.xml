@@ -9,6 +9,12 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Want Tutorial or not"
+        android:id="@+id/wantTutorial"/>
+
     <Button
         android:id="@+id/btn_simple_example"
         android:layout_width="match_parent"
