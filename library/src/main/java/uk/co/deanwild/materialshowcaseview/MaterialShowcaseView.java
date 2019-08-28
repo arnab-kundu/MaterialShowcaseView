@@ -149,8 +149,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     private void heightWidthCalculation() {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        width = widthOfScreen =displayMetrics.widthPixels;
-        height = heightOfScreen =  displayMetrics.heightPixels;
+        width = widthOfScreen = displayMetrics.widthPixels;
+        height = heightOfScreen = displayMetrics.heightPixels;
     }
 
     private void init(Context context) {
@@ -222,8 +222,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         heightWidthCalculation();
-        contentView.setLayoutParams(new FrameLayout.LayoutParams(widthOfScreen, heightOfScreen));
-        contentView.invalidate();
+
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Log.d("msg", "LANDSCAPE");
             orientation = Configuration.ORIENTATION_LANDSCAPE;
@@ -231,9 +230,16 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             Log.d("msg", "PORTRAIT");
             orientation = Configuration.ORIENTATION_PORTRAIT;
         }
+
+        LayoutParams contentLP = (LayoutParams) mContentBox.getLayoutParams();
+        contentLP.width = widthOfScreen;
+        contentLP.height = heightOfScreen;
+        mContentBox.setLayoutParams(contentLP);
+        contentView.setLayoutParams(new FrameLayout.LayoutParams(widthOfScreen, heightOfScreen));
+        contentView.invalidate();
+
+
     }
-
-
 
 
     /**
@@ -323,8 +329,6 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
 
 
-
-
         // Setup a textview like you normally would with your activity context
         TextView tv = new TextView(getContext()); //Ignore the warning tried to initialize one time creating some crash issue
 
@@ -338,24 +342,21 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         tv.setDrawingCacheEnabled(true);
 
         // we need to setup how big the view should be..which is exactly as big as the canvas
-        tv.measure(MeasureSpec.makeMeasureSpec(canvas.getWidth()-120, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(canvas.getHeight(), MeasureSpec.EXACTLY));
+        tv.measure(MeasureSpec.makeMeasureSpec(canvas.getWidth() - 120, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(canvas.getHeight(), MeasureSpec.EXACTLY));
 
         // assign the layout values to the textview
         tv.layout(0, 0, tv.getMeasuredWidth(), tv.getMeasuredHeight());
 
         // draw the bitmap from the drawingcache to the canvas
-       // canvas.drawBitmap(tv.getDrawingCache(), 0, 0, mContentPaint);
+        // canvas.drawBitmap(tv.getDrawingCache(), 0, 0, mContentPaint);
 
         // disable drawing cache
         tv.setDrawingCacheEnabled(true);
 
 
-
-
-
         //Button in lower side
         if (mYPosition > heightOfScreen / 2) {
-            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)), mLinePaint);
+            mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)) + 60, mLinePaint);
             //Draw Title
             if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
                 mTitlePaint.setTextAlign(Paint.Align.CENTER);
@@ -370,7 +371,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
                 tv.setGravity(Gravity.END);
                 mCanvas.drawText(titleText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 125), mTitlePaint);
                 //mCanvas.drawText(contentText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
-                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin*2, ((int) ((heightOfScreen / 3) - 75)), mContentPaint);
+                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin * 2, ((int) ((heightOfScreen / 3) - 75)), mContentPaint);
             } else {
                 mCanvas.drawText(titleText, leftMargin, ((int) (heightOfScreen / 3) - 125), mTitlePaint);
                 //mCanvas.drawText(contentText, leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
@@ -584,35 +585,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     }
 
     private void applyLayoutParams() {
-
-        if (mContentBox != null && mContentBox.getLayoutParams() != null) {
-            LayoutParams contentLP = (LayoutParams) mContentBox.getLayoutParams();
-
-            boolean layoutParamsChanged = false;
-
-            if (contentLP.bottomMargin != mContentBottomMargin) {
-                contentLP.bottomMargin = mContentBottomMargin;
-                layoutParamsChanged = true;
-            }
-
-            if (contentLP.topMargin != mContentTopMargin) {
-                contentLP.topMargin = mContentTopMargin;
-                layoutParamsChanged = true;
-            }
-
-            if (contentLP.gravity != mGravity) {
-                contentLP.gravity = mGravity;
-                layoutParamsChanged = true;
-            }
-
-            /**
-             * Only apply the layout params if we've actually changed them, otherwise we'll get stuck in a layout loop
-             */
-            if (layoutParamsChanged)
-                mContentBox.setLayoutParams(contentLP);
-
-            updateToolTip();
-        }
+        updateToolTip();
     }
 
     void updateToolTip() {
@@ -1194,6 +1167,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         /**
          * if we're in single use mode and have already shot our bolt then do nothing
          */
+        heightWidthCalculation();
+
         if (mSingleUse) {
             if (mPrefsManager.hasFired()) {
                 return false;
@@ -1220,6 +1195,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         }
 
+        contentView.setLayoutParams(new FrameLayout.LayoutParams(widthOfScreen, heightOfScreen));
+        contentView.invalidate();
 
         mHandler = new Handler();
         mHandler.postDelayed(new Runnable() {
@@ -1227,11 +1204,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             public void run() {
                 boolean attached;
                 // taken from https://android.googlesource.com/platform/frameworks/support/+/refs/heads/androidx-master-dev/core/src/main/java/androidx/core/view/ViewCompat.java#3310
-                if (Build.VERSION.SDK_INT >= 19) {
-                    attached = isAttachedToWindow();
-                } else {
-                    attached = getWindowToken() != null;
-                }
+                attached = isAttachedToWindow();
                 if (mShouldAnimate && attached) {
                     fadeIn();
                 } else {
