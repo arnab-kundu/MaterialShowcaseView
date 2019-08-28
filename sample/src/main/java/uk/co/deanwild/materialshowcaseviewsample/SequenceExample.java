@@ -2,6 +2,7 @@ package uk.co.deanwild.materialshowcaseviewsample;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +11,8 @@ import android.util.Log;
 import android.view.Display;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -55,6 +54,16 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
            Log.d("msg","no");*/
 
         presentShowcaseSequence(); // one second delay
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //Toast.makeText(this, "LANDSCAPE", Toast.LENGTH_SHORT).show();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //Toast.makeText(this, "PORTRAIT", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -108,10 +117,10 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
     private void presentShowcaseSequence() {
 
         ShowcaseConfig config = new ShowcaseConfig();
-        config.setDelay(0); // half second between each showcase view
+        config.setDelay(300); // half second between each showcase view
         config.setItemCount(4);
-        SharedPreferences sharedPreferences=getSharedPreferences("ARC",MODE_PRIVATE);
-        config.setShowEveryTime(sharedPreferences.getBoolean("wantTutorial",false));
+        SharedPreferences sharedPreferences = getSharedPreferences("ARC", MODE_PRIVATE);
+        config.setShowEveryTime(sharedPreferences.getBoolean("wantTutorial", false));
         MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
 
         sequence.setOnItemShownListener(new MaterialShowcaseSequence.OnSequenceItemShownListener() {
@@ -120,55 +129,12 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
                 //Toast.makeText(itemView.getContext(), "Item #" + position, Toast.LENGTH_SHORT).show();
             }
         });
-
         sequence.setConfig(config);
-        /*sequence.addSequenceItem(
-                new MaterialShowcaseView.Builder(this)
-                        .setSkipText("SKIP")
-                        .setTarget(mButtonOne)
-                        .setTitleText("Aman")
-                        .setContentText("This is button One")
-                        .withCircleShape()
-                        .build()
-        );
-
-        sequence.addSequenceItem(
-                new MaterialShowcaseView.Builder(this)
-                        .setSkipText("SKIP")
-                        .setTitleText("Arnab")
-                        .setTarget(mButtonTwo)
-                        .setContentText("This is button two")
-                        .withCircleShape()
-                        .build()
-        );
-
-        sequence.addSequenceItem(
-                new MaterialShowcaseView.Builder(this)
-                        .setTarget(mButtonThree)
-                        .setTitleText("Kumar")
-                        .setContentText("This is button three")
-                        .withCircleShape()
-                        .build()
-        );
-
-        sequence.addSequenceItem(
-                new MaterialShowcaseView.Builder(this)
-                        .setTarget(mButtonReset)
-                        .setTitleText("reset")
-                        .setContentText("This is button reset")
-                        .withCircleShape()
-                        .build()
-        );*/
-
-        sequence.addSequenceItem(mButtonOne,"Aman","This is Button one");
-        sequence.addSequenceItem(mButtonTwo,"Arnab","This is Button two");
-        sequence.addSequenceItem(mButtonThree,"Kumar","This is Button three");
-        sequence.addSequenceItem(mButtonReset,"Reset","This is Button Reset");
-
-
-
+        sequence.addSequenceItem(mButtonOne, "Aman", "Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s)");
+        sequence.addSequenceItem(mButtonTwo, "Arnab", "Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s)");
+        sequence.addSequenceItem(mButtonThree, "Kumar", "Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s)");
+        sequence.addSequenceItem(mButtonReset, "Reset", "Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s)");
         sequence.start();
-
     }
 
 }

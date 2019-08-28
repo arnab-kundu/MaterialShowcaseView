@@ -111,6 +111,11 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     int leftMargin = 45;
     String titleText, contentText;
     float screenDensity = 1.5f;
+    int orientation = 1;
+    private View contentView;
+    int width = 0;
+    int height = 0;
+
 
     public MaterialShowcaseView(Context context) {
         super(context);
@@ -133,15 +138,26 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         init(context);
     }
 
-
-    private void init(Context context) {
-        setWillNotDraw(false);
-
+    private void refreshScreenDimensionOnRotation() {
         Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         widthOfScreen = size.x;
         heightOfScreen = size.y;
+    }
+
+    private void heightWidthCalculation() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        width = widthOfScreen =displayMetrics.widthPixels;
+        height = heightOfScreen =  displayMetrics.heightPixels;
+    }
+
+    private void init(Context context) {
+
+        setWillNotDraw(false);
+
+        heightWidthCalculation();
 
         mListeners = new ArrayList<>();
         // make sure we add a global layout listener so we can adapt to changes
@@ -154,11 +170,11 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         mMaskColour = Color.parseColor(ShowcaseConfig.DEFAULT_MASK_COLOUR);
         setVisibility(INVISIBLE);
 
-
-        View contentView = LayoutInflater.from(getContext()).inflate(R.layout.showcase_content, this, true);
+        contentView = LayoutInflater.from(getContext()).inflate(R.layout.showcase_content, this, true);
         contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen, heightOfScreen));
         indicator = contentView.findViewById(R.id.indicator);
-        switch (display.getRotation()) {
+
+        switch (getResources().getConfiguration().orientation) {
             case Surface.ROTATION_0:
                 System.out.println("SCREEN_ORIENTATION_PORTRAIT");
                 break;
@@ -173,7 +189,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
             case Surface.ROTATION_270:
                 System.out.println("SCREEN_ORIENTATION_REVERSE_LANDSCAPE");
-                //TODO
+                // To Handle Hardware Keyboard Height added 144 in landscape mode
                 if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     //getResources().getConfiguration().navigation == Configuration.NAVIGATIONHIDDEN_NO) {
                     contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen + 144, heightOfScreen));
@@ -183,17 +199,6 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
                 }
                 break;
         }
-       /* if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
-                getResources().getConfiguration().navigation == Configuration.NAVIGATIONHIDDEN_NO) {
-            Log.e("landscape", "yes" + widthOfScreen);
-            contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen, heightOfScreen));
-        } else if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE &&
-                getResources().getConfiguration().navigation == Configuration.NAVIGATIONHIDDEN_YES) {
-            //TODO
-        } else {
-            Log.e("landscape", "no" + widthOfScreen);
-            contentView.setLayoutParams(new ViewGroup.LayoutParams(widthOfScreen, heightOfScreen));
-        }*/
         mContentBox = contentView.findViewById(R.id.content_box);
         mTitleTextView = contentView.findViewById(R.id.tv_title);
         mContentTextView = contentView.findViewById(R.id.tv_content);
@@ -213,6 +218,24 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     }
 
 
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        heightWidthCalculation();
+        contentView.setLayoutParams(new FrameLayout.LayoutParams(widthOfScreen, heightOfScreen));
+        contentView.invalidate();
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Log.d("msg", "LANDSCAPE");
+            orientation = Configuration.ORIENTATION_LANDSCAPE;
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Log.d("msg", "PORTRAIT");
+            orientation = Configuration.ORIENTATION_PORTRAIT;
+        }
+    }
+
+
+
+
     /**
      * Interesting drawing stuff.
      * We draw a block of semi transparent colour to fill the whole screen then we draw of transparency
@@ -224,14 +247,13 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
         // don't bother drawing if we're not ready
         if (!mShouldRender) return;
+        //helpText.setText(contentText);
+        heightWidthCalculation();
 
-        // get current dimensions
-        final int width = getMeasuredWidth();
-        final int height = getMeasuredHeight();
-
+        Log.d("msg", "onDraw: width " + width);
+        Log.d("msg", "onDraw: height " + height);
         // don't bother drawing if there is nothing to draw on
         if (width <= 0 || height <= 0) return;
 
@@ -299,8 +321,38 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
                 mContentPaint.setTextSize(10);
             }
         }
-        // draw (erase) shape
-        // mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
+
+
+
+
+        // Setup a textview like you normally would with your activity context
+        TextView tv = new TextView(getContext()); //Ignore the warning tried to initialize one time creating some crash issue
+
+        // setup text
+        tv.setText(contentText);
+
+        // maybe set textcolor
+        tv.setTextColor(Color.WHITE);
+
+        // you have to enable setDrawingCacheEnabled, or the getDrawingCache will return null
+        tv.setDrawingCacheEnabled(true);
+
+        // we need to setup how big the view should be..which is exactly as big as the canvas
+        tv.measure(MeasureSpec.makeMeasureSpec(canvas.getWidth()-120, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(canvas.getHeight(), MeasureSpec.EXACTLY));
+
+        // assign the layout values to the textview
+        tv.layout(0, 0, tv.getMeasuredWidth(), tv.getMeasuredHeight());
+
+        // draw the bitmap from the drawingcache to the canvas
+       // canvas.drawBitmap(tv.getDrawingCache(), 0, 0, mContentPaint);
+
+        // disable drawing cache
+        tv.setDrawingCacheEnabled(true);
+
+
+
+
+
         //Button in lower side
         if (mYPosition > heightOfScreen / 2) {
             mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen / 3)), mLinePaint);
@@ -308,19 +360,24 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
                 mTitlePaint.setTextAlign(Paint.Align.CENTER);
                 mContentPaint.setTextAlign(Paint.Align.CENTER);
+                tv.setGravity(Gravity.CENTER_HORIZONTAL);
                 mCanvas.drawText(titleText, mXPosition, ((int) ((heightOfScreen / 3) - 125)), mTitlePaint);
-                mCanvas.drawText(contentText, mXPosition, ((int) ((heightOfScreen / 3) - 75)), mContentPaint);
+                //mCanvas.drawText(contentText, mXPosition, ((int) ((heightOfScreen / 3) - 75)), mContentPaint);
+                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin, ((int) ((heightOfScreen / 3) - 75)), mContentPaint);
             } else if (mXPosition > widthOfScreen / 2) {
                 mTitlePaint.setTextAlign(Paint.Align.RIGHT);
                 mContentPaint.setTextAlign(Paint.Align.RIGHT);
+                tv.setGravity(Gravity.END);
                 mCanvas.drawText(titleText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 125), mTitlePaint);
-                mCanvas.drawText(contentText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
+                //mCanvas.drawText(contentText, widthOfScreen - leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
+                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin*2, ((int) ((heightOfScreen / 3) - 75)), mContentPaint);
             } else {
                 mCanvas.drawText(titleText, leftMargin, ((int) (heightOfScreen / 3) - 125), mTitlePaint);
-                mCanvas.drawText(contentText, leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
+                //mCanvas.drawText(contentText, leftMargin, ((int) (heightOfScreen / 3) - 75), mContentPaint);
+                tv.setGravity(Gravity.START);
+                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin, ((int) ((heightOfScreen / 3) - 75)), mContentPaint);
             }
         }
-
         //Button in upper side
         else {
             mCanvas.drawLine(mXPosition, mYPosition, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3))), mLinePaint);
@@ -328,24 +385,32 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
             if (mXPosition < widthOfScreen / 2 + widthOfScreen / 10 && mXPosition > widthOfScreen / 2 - widthOfScreen / 10) {
                 mTitlePaint.setTextAlign(Paint.Align.CENTER);
                 mContentPaint.setTextAlign(Paint.Align.CENTER);
+                tv.setGravity(Gravity.CENTER_HORIZONTAL);
                 mCanvas.drawText(titleText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) + 75)), mTitlePaint);
-                mCanvas.drawText(contentText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+                //mCanvas.drawText(contentText, mXPosition, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
             } else if (mXPosition > widthOfScreen / 2) {
                 mTitlePaint.setTextAlign(Paint.Align.RIGHT);
                 mContentPaint.setTextAlign(Paint.Align.RIGHT);
+                tv.setGravity(Gravity.END);
                 mCanvas.drawText(titleText, widthOfScreen - leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 75)), mTitlePaint);
-                mCanvas.drawText(contentText, widthOfScreen - leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+                //mCanvas.drawText(contentText, widthOfScreen - leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
 
             } else {
                 mCanvas.drawText(titleText, leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 75)), mTitlePaint);
-                mCanvas.drawText(contentText, leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+                //mCanvas.drawText(contentText, leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
+                tv.setGravity(Gravity.START);
+                mCanvas.drawBitmap(tv.getDrawingCache(), leftMargin, ((int) (heightOfScreen - (heightOfScreen / 3) + 125)), mContentPaint);
             }
         }
 
+
+        //mCanvas.drawBitmap(view.getDrawingCache(), 0, mYPosition + view.getHeight(), mTitlePaint);
         mShape.draw(mCanvas, mEraser, mXPosition, mYPosition);
         //Draw Content
 
-        Log.d("heightOfScreen", "" + heightOfScreen);
+
         // Draw the bitmap on our views  canvas.
         canvas.drawBitmap(mBitmap, 0, 0, null);
     }
