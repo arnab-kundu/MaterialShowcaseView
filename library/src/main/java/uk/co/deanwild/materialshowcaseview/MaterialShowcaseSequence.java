@@ -1,6 +1,7 @@
 package uk.co.deanwild.materialshowcaseview;
 
 import android.app.Activity;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.View;
 
@@ -13,7 +14,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
     PrefsManager mPrefsManager;
     List<MaterialShowcaseView> mShowcaseQueue;
     private boolean mSingleUse = false;
-    Activity mActivity;
+    DialogFragment mActivity;
     private ShowcaseConfig mConfig;
     private int mSequencePosition = 0;
 
@@ -22,12 +23,12 @@ public class MaterialShowcaseSequence implements IDetachedListener {
     int count = -1;
     private boolean isNext = true;
 
-    public MaterialShowcaseSequence(Activity activity) {
+    public MaterialShowcaseSequence(DialogFragment activity) {
         mActivity = activity;
         mShowcaseQueue = new ArrayList<>();
     }
 
-    public MaterialShowcaseSequence(Activity activity, String sequenceID) {
+    public MaterialShowcaseSequence(DialogFragment activity, String sequenceID) {
         this(activity);
         this.singleUse(sequenceID);
     }
@@ -67,7 +68,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
     public MaterialShowcaseSequence singleUse(String sequenceID) {
         mSingleUse = true;
-        mPrefsManager = new PrefsManager(mActivity, sequenceID);
+        mPrefsManager = new PrefsManager(mActivity.getActivity(), sequenceID);
         return this;
     }
 
@@ -127,7 +128,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
         } else {
             count--;
         }
-        if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing() && count <= mShowcaseQueue.size() - 1 && count >= 0) {
+        if (mShowcaseQueue.size() > 0 && count <= mShowcaseQueue.size() - 1 && count >= 0) {
             MaterialShowcaseView sequenceItem = mShowcaseQueue.get(count);
             sequenceItem.setDetachedListener(this);
             sequenceItem.show(mActivity, mShowcaseQueue.size(), count);
@@ -148,7 +149,7 @@ public class MaterialShowcaseSequence implements IDetachedListener {
 
         mShowcaseQueue.clear();
 
-        if (mShowcaseQueue.size() > 0 && !mActivity.isFinishing()) {
+        if (mShowcaseQueue.size() > 0 && !mActivity.getShowsDialog()) {
             MaterialShowcaseView sequenceItem = mShowcaseQueue.get(0);
             sequenceItem.setDetachedListener(this);
             sequenceItem.show(mActivity, mShowcaseQueue.size(), 0);

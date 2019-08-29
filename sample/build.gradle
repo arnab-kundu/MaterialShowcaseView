@@ -16,6 +16,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            java {
+                exclude '**/CustomExample.java'
+                exclude '**/TooltipExample.java'
+                exclude '**/SimpleSingleExample.java'
+            }
+        }
+        androidTest {
+            java {
+                exclude '**/CustomExample.java'
+                exclude '**/TooltipExample.java'
+                exclude '**/SimpleSingleExample.java'
+            }
+        }
+    }
+
 }
 
 dependencies {

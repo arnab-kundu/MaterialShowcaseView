@@ -53,7 +53,10 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
        }else
            Log.d("msg","no");*/
 
-        presentShowcaseSequence(); // one second delay
+        //presentShowcaseSequence(); // one second delay
+        MyDialogFragment myDialogFragment = new MyDialogFragment();
+        myDialogFragment.show(getSupportFragmentManager(),"asd");
+
     }
 
     @Override
@@ -71,7 +74,7 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
 
         if (v.getId() == R.id.btn_one || v.getId() == R.id.btn_two || v.getId() == R.id.btn_three) {
 
-            presentShowcaseSequence();
+            //presentShowcaseSequence();
 
         } else if (v.getId() == R.id.btn_reset) {
 
@@ -114,7 +117,7 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
         return hasSoftwareKeys;
     }
 
-    private void presentShowcaseSequence() {
+ /*   private void presentShowcaseSequence() {
 
         ShowcaseConfig config = new ShowcaseConfig();
         config.setDelay(300); // half second between each showcase view
@@ -135,6 +138,6 @@ public class SequenceExample extends AppCompatActivity implements View.OnClickLi
         sequence.addSequenceItem(mButtonThree, "Kumar", "Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s)");
         sequence.addSequenceItem(mButtonReset, "Reset", "Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s) + Associate one or more equipment with the PIN location to identify equipment location(s)");
         sequence.start();
-    }
+    }*/
 
 }

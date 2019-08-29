@@ -70,11 +70,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.btn_simple_example:
-                intent = new Intent(this, SimpleSingleExample.class);
+              //  intent = new Intent(this, SimpleSingleExample.class);
                 break;
 
             case R.id.btn_custom_example:
-                intent = new Intent(this, CustomExample.class);
+               // intent = new Intent(this, CustomExample.class);
                 break;
 
             case R.id.btn_sequence_example:
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_tooltip_example:
-                intent = new Intent(this, TooltipExample.class);
+               // intent = new Intent(this, TooltipExample.class);
                 break;
 
             case R.id.btn_reset_all:

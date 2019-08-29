@@ -2,6 +2,7 @@ package uk.co.deanwild.materialshowcaseview;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -534,21 +535,6 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         if (mTarget != null) {
 
-            /**
-             * If we're on lollipop then make sure we don't draw over the nav bar
-             */
-          /*  if (!mRenderOverNav && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-
-
-                mBottomMargin = getSoftButtonsBarSizePort();
-
-
-                FrameLayout.LayoutParams contentLP = (LayoutParams) getLayoutParams();
-
-                if (contentLP != null && contentLP.bottomMargin != mBottomMargin)
-                    contentLP.bottomMargin = mBottomMargin;
-            }*/
-
             // apply the target position
             Point targetPoint = mTarget.getPoint();
             Rect targetBounds = mTarget.getBounds();
@@ -858,12 +844,12 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
 
         final MaterialShowcaseView showcaseView;
 
-        private final Activity activity;
+        private final DialogFragment activity;
 
-        public Builder(Activity activity) {
+        public Builder(DialogFragment activity) {
             this.activity = activity;
 
-            showcaseView = new MaterialShowcaseView(activity);
+            showcaseView = new MaterialShowcaseView(activity.getActivity());
         }
 
         /**
@@ -1162,7 +1148,7 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
      * @param activity
      * @return
      */
-    public boolean show(final Activity activity, int pageCount, int currentPosition) {
+    public boolean show(DialogFragment dialog, int pageCount, int currentPosition) {
 
         /**
          * if we're in single use mode and have already shot our bolt then do nothing
@@ -1178,7 +1164,8 @@ public class MaterialShowcaseView extends FrameLayout implements View.OnTouchLis
         }
         //if (((ViewGroup) activity.getWindow().getDecorView()).getChildCount() > 0)
         //((ViewGroup) activity.getWindow().getDecorView()).removeAllViews();
-        ((ViewGroup) activity.getWindow().getDecorView()).addView(this);
+        // ((ViewGroup) ((Activity)activity).getWindow().getDecorView()).addView(this);
+        ((ViewGroup) dialog.getDialog().getWindow().getDecorView()).addView(this);
         indicator.createIndicators(sequenceItemCount, currentPosition);
         setShouldRender(true);
 
